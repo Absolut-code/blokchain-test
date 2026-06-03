@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Блокчейн Викторина — Quizizz Style</title>
+  <meta name="description" content="Интерактивное Quizizz-подобное веб-приложение для тестирования знаний по блокчейн технологиям. Проходите тесты снова и снова, бейте рекорды и активируйте бонусы!">
+  
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Web App Manifest & PWA Support -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#6366f1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="icon-512.png">
+</head>
+<body>
+  <!-- Animated background particles container -->
+  <div class="bg-particles" id="bgParticles"></div>
+  <div class="bg-glow"></div>
+
+  <main class="app-container">
+    
+    <!-- LOBBY SCREEN -->
+    <section id="lobbyScreen" class="screen active">
+      <header class="lobby-header">
+        <div class="logo-area">
+          <div class="logo-icon">⛓️</div>
+          <h1>BLOCKCHAIN<span>QUIZ</span></h1>
+        </div>
+        <p class="subtitle">Интерактивный тренажер по блокчейну в стиле Quizizz. Закрепляйте знания, ставьте рекорды и побеждайте!</p>
+      </header>
+
+      <div class="lobby-card glass">
+        <!-- Range Selector -->
+        <div class="config-group">
+          <label for="questionRange"><span class="icon">📂</span> Выберите тему / диапазон вопросов:</label>
+          <select id="questionRange" class="styled-select">
+            <option value="all" selected>Все вопросы (1-301) — Полный курс</option>
+            <option value="1-40">Вопросы 1-40: Введение в Блокчейн</option>
+            <option value="41-80">Вопросы 41-80: Основы и Децентрализация</option>
+            <option value="81-120">Вопросы 81-120: Архитектура и Хэширование</option>
+            <option value="121-160">Вопросы 121-160: Криптография и Ключи</option>
+            <option value="161-201">Вопросы 161-201: Консенсусы и Безопасность</option>
+            <option value="202-241">Вопросы 202-241: Атаки и Разветвления (Forks)</option>
+            <option value="242-281">Вопросы 242-281: Криптовалюты и Сеть Bitcoin</option>
+            <option value="282-301">Вопросы 282-301: Смарт-контракты и DeFi</option>
+          </select>
+        </div>
+
+        <!-- Question Count Selector -->
+        <div class="config-group">
+          <label for="questionCount"><span class="icon">🔢</span> Количество вопросов в раунде:</label>
+          <div class="btn-group-toggle" id="countGroup">
+            <button type="button" class="toggle-btn" data-value="10">10</button>
+            <button type="button" class="toggle-btn active" data-value="20">20</button>
+            <button type="button" class="toggle-btn" data-value="40">40</button>
+            <button type="button" class="toggle-btn" data-value="max">Все</button>
+          </div>
+        </div>
+
+        <!-- Settings Toggles Grid -->
+        <div class="settings-grid">
+          <div class="settings-option">
+            <div class="option-info">
+              <span class="option-title">⏳ Таймер ответа</span>
+              <span class="option-desc">20 секунд на вопрос</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="settingTimer" checked>
+              <span class="slider round"></span>
+            </label>
+          </div>
+
+          <div class="settings-option">
+            <div class="option-info">
+              <span class="option-title">🔀 Перемешать вопросы</span>
+              <span class="option-desc">Случайный порядок вопросов</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="settingShuffleQuestions" checked>
+              <span class="slider round"></span>
+            </label>
+          </div>
+
+          <div class="settings-option">
+            <div class="option-info">
+              <span class="option-title">🔄 Перемешать ответы</span>
+              <span class="option-desc">Случайный порядок вариантов</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="settingShuffleOptions" checked>
+              <span class="slider round"></span>
+            </label>
+          </div>
+
+          <div class="settings-option">
+            <div class="option-info">
+              <span class="option-title">🔊 Звуковые эффекты</span>
+              <span class="option-desc">Звуки побед и ошибок</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="settingSound" checked>
+              <span class="slider round"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Start Button -->
+        <button id="startGameBtn" class="primary-btn glow-effect">
+          <span class="btn-text">ПОЕХАЛИ! 🚀</span>
+        </button>
+      </div>
+
+      <!-- Quick stats in lobby -->
+      <div class="lobby-footer">
+        <p>Всего в базе данных: <strong id="totalDBQuestions">301</strong> вопросов на казахском языке.</p>
+      </div>
+    </section>
+
+    <!-- GAMEPLAY SCREEN -->
+    <section id="gameplayScreen" class="screen">
+      <!-- Status Top Bar -->
+      <header class="game-header">
+        <div class="header-left">
+          <button id="exitGameBtn" class="exit-btn" title="Выйти в главное меню">🚪 Выйти</button>
+          <div class="progress-badge glass" id="questionProgress">Вопрос 1 / 20</div>
+        </div>
+        
+        <div class="header-center">
+          <div class="score-badge">
+            <span class="score-label">ОЧКИ</span>
+            <span class="score-val" id="scoreDisplay">0000</span>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <div class="streak-badge glass" id="streakBadge">
+            <span class="streak-fire">🔥</span> <span class="streak-val" id="streakDisplay">0</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Timer Progress Bar -->
+      <div class="timer-container">
+        <div class="timer-bar" id="timerBar"></div>
+      </div>
+
+      <!-- Main Game Area -->
+      <div class="game-layout">
+        <!-- Question Box -->
+        <div class="question-box glass" id="questionBox">
+          <p id="questionText">Здесь будет текст вопроса на казахском языке?</p>
+        </div>
+
+        <!-- Options Container -->
+        <div class="options-container" id="optionsContainer">
+          <!-- Dynamically inserted buttons A, B, C, D, E -->
+        </div>
+      </div>
+
+      <!-- Power-Ups Footer Panel -->
+      <div class="powerups-panel glass">
+        <span class="powerups-title">БОНУСЫ (POWER-UPS):</span>
+        <div class="powerups-list">
+          <button class="powerup-btn" id="powerup5050" title="Удалить 2 неверных ответа">
+            <span class="pu-icon">🌓</span> 50:50
+          </button>
+          <button class="powerup-btn" id="powerupFreeze" title="Остановить таймер на этот вопрос">
+            <span class="pu-icon">❄️</span> Заморозка
+          </button>
+          <button class="powerup-btn" id="powerupDouble" title="Получить двойные очки за этот вопрос">
+            <span class="pu-icon">⚡</span> х2 Очки
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEEDBACK SCREEN (OVERLAY CARD) -->
+    <div id="feedbackOverlay" class="overlay">
+      <div class="feedback-card glass animate-pop">
+        <div class="feedback-icon" id="feedbackIcon">🎉</div>
+        <h2 class="feedback-title" id="feedbackTitle">Правильно!</h2>
+        <p class="feedback-meme" id="feedbackMeme">Великолепная работа!</p>
+        <div class="points-awarded" id="feedbackPoints">+100 очков</div>
+        <button id="nextQuestionBtn" class="primary-btn">Далее ➡️</button>
+      </div>
+    </div>
+
+    <!-- REDEMPTION SCREEN -->
+    <section id="redemptionScreen" class="screen">
+      <div class="redemption-card glass animate-pop">
+        <div class="redemption-badge">СПАСИТЕЛЬНЫЙ КРУГ 🛟</div>
+        <h2>Время исправить ошибку!</h2>
+        <p class="redemption-desc">В течение игры вы совершили ошибки. Выберите один из неверно отвеченных вопросов ниже и ответьте правильно, чтобы заработать бонусные очки!</p>
+        
+        <div class="redemption-choices" id="redemptionChoicesList">
+          <!-- Button list of failed question indexes -->
+        </div>
+
+        <!-- Hidden container that opens when question selected -->
+        <div id="redemptionGameArea" class="redemption-game-area" style="display: none;">
+          <div class="question-box glass" id="redemptionQuestionBox">
+            <p id="redemptionQuestionText">Текст спасительного вопроса</p>
+          </div>
+          <div class="options-container" id="redemptionOptionsContainer">
+            <!-- Shuffled options -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GAME OVER SCREEN -->
+    <section id="gameOverScreen" class="screen">
+      <header class="gameover-header">
+        <h1>Результаты Игры</h1>
+        <p>Поздравляем с завершением викторины!</p>
+      </header>
+
+      <!-- Stats Showcase Grid -->
+      <div class="stats-grid">
+        <div class="stat-card glass">
+          <span class="stat-icon">🏆</span>
+          <span class="stat-value" id="finalScore">0</span>
+          <span class="stat-label">Итоговые Очки</span>
+        </div>
+
+        <div class="stat-card glass">
+          <div class="progress-ring-container">
+            <svg class="progress-ring" width="120" height="120">
+              <circle class="progress-ring-circle-bg" stroke="rgba(255,255,255,0.1)" stroke-width="8" fill="transparent" r="50" cx="60" cy="60"/>
+              <circle class="progress-ring-circle" id="accuracyCircle" stroke="var(--neon-green)" stroke-width="8" fill="transparent" r="50" cx="60" cy="60" stroke-dasharray="314.16" stroke-dashoffset="314.16"/>
+            </svg>
+            <div class="progress-ring-text" id="finalAccuracy">0%</div>
+          </div>
+          <span class="stat-label">Точность ответов</span>
+        </div>
+
+        <div class="stat-card glass">
+          <span class="stat-icon">🔥</span>
+          <span class="stat-value" id="finalStreak">0</span>
+          <span class="stat-label">Макс. Комбо (Streak)</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button id="restartGameBtn" class="primary-btn glow-effect">🔄 Пройти заново</button>
+        <button id="goHomeBtn" class="secondary-btn">🏠 На главную</button>
+      </div>
+
+      <!-- Detailed Report Area -->
+      <div class="report-section glass">
+        <h2>📊 Подробный разбор раунда</h2>
+        <div class="report-list" id="reportList">
+          <!-- Dynamic report items -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Load core question database -->
+  <script src="questions.js"></script>
+  <!-- Load main app logic -->
+  <script src="app.js"></script>
+  
+  <!-- Register Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js')
+          .then((reg) => console.log('Service Worker registered successfully:', reg.scope))
+          .catch((err) => console.error('Service Worker registration failed:', err));
+      });
+    }
+  </script>
+</body>
+</html>

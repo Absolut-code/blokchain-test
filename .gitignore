@@ -1,0 +1,6 @@
+*.docx
+*.zip
+__pycache__/
+.env
+claud_design/
+open_design/
