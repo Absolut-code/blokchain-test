@@ -1,4 +1,5 @@
 *.docx
+*.doc
 *.zip
 __pycache__/
 .env

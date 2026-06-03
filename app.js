@@ -343,7 +343,7 @@ function updateLobbyForSubject() {
       else if (start === 242) title += ': Криптовалюты и Сеть Bitcoin';
       else if (start === 282) title += ': Смарт-контракты и DeFi';
       opt.textContent = title;
-    } else {
+    } else if (subject === 'economy') {
       let title = `Сұрақтар ${start}-${end}`;
       if (start === 1) title += ': Кіріспе және Өндірістік кәсіпорын';
       else if (start === 41) title += ': Негізгі және Айналым қорлары';
@@ -353,6 +353,17 @@ function updateLobbyForSubject() {
       else if (start === 202) title += ': Инвестициялар және Негізгі қорлар тозуы';
       else if (start === 242) title += ': Айналым қорларының айналымы';
       else if (start === 282) title += ': Шығындар сметасы және Тарифтер';
+      opt.textContent = title;
+    } else if (subject === 'law') {
+      let title = `Сұрақтар ${start}-${end}`;
+      if (start === 1) title += ': Заңнама және Кодекстер';
+      else if (start === 41) title += ': Кәсіпкерлік субъектілері және Тіркеу';
+      else if (start === 81) title += ': Лицензиялау және Реттеу';
+      else if (start === 121) title += ': Шаруашылық серіктестіктер және Қоғамдар';
+      else if (start === 161) title += ': Банкроттық және Дәрменсіздік';
+      else if (start === 201) title += ': Мемлекеттік реттеу және Сатып алулар';
+      else if (start === 241) title += ': Инвестициялар және Концессия';
+      else if (start === 281) title += ': Сауда және Сақтандыру қызметі';
       opt.textContent = title;
     }
     DOM.questionRange.appendChild(opt);
