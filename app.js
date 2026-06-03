@@ -365,6 +365,17 @@ function updateLobbyForSubject() {
       else if (start === 241) title += ': Инвестициялар және Концессия';
       else if (start === 281) title += ': Сауда және Сақтандыру қызметі';
       opt.textContent = title;
+    } else if (subject === 'theory') {
+      let title = `Сұрақтар ${start}-${end}`;
+      if (start === 1) title += ': Кәсіпкерлік теориялық негіздері';
+      else if (start === 41) title += ': Нарықтық орта және Консалтинг';
+      else if (start === 81) title += ': Ұйымдық формалар және Тіркеу';
+      else if (start === 121) title += ': Цифрлық экономика және Факторлар';
+      else if (start === 161) title += ': Цифрландыру және Салалар';
+      else if (start === 201) title += ': Бұлтты технологиялар және Деректер';
+      else if (start === 241) title += ': Сандық платформалар және Даму';
+      else if (start === 281) title += ': Цифрлық ақша теориясы';
+      opt.textContent = title;
     }
     DOM.questionRange.appendChild(opt);
   }
