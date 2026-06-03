@@ -129,7 +129,7 @@ const state = {
   selectedCount: 20,
   configShuffleQuestions: true,
   configShuffleOptions: true,
-  configTimerEnabled: true,
+  configTimerEnabled: false,
   configSoundEnabled: true,
 };
 
