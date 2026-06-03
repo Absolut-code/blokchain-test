@@ -1,4 +1,4 @@
-const CACHE_NAME = 'blockchain-quiz-v2';
+const CACHE_NAME = 'blockchain-quiz-v3';
 const ASSETS = [
   './',
   './index.html',

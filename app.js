@@ -526,6 +526,11 @@ function handleAnswerSelection(selectedBtn, correctText, clickX, clickY) {
   const options = DOM.optionsContainer.querySelectorAll('.option-btn');
   options.forEach(opt => opt.style.pointerEvents = 'none');
   
+  // Disable power-up clicks immediately during the delay
+  DOM.powerup5050.disabled = true;
+  DOM.powerupFreeze.disabled = true;
+  DOM.powerupDouble.disabled = true;
+  
   const isCorrect = selectedBtn.getAttribute('data-correct') === 'true';
   const selectedText = selectedBtn.getAttribute('data-text');
   const timeSpent = state.timerDuration - state.timeLeft;
@@ -571,8 +576,11 @@ function handleAnswerSelection(selectedBtn, correctText, clickX, clickY) {
     
     updateStreakUI();
     
-    const randomMeme = CORRECT_MEMES_RU[Math.floor(Math.random() * CORRECT_MEMES_RU.length)];
-    showFeedbackModal(true, randomMeme, `Шкала скорости: +${Math.round(400 * speedRatio)} | Серия: +${streakBonus}`, scoreAdded);
+    // Delay feedback popup so user can see highlights (1.5 seconds for correct answer)
+    setTimeout(() => {
+      const randomMeme = CORRECT_MEMES_RU[Math.floor(Math.random() * CORRECT_MEMES_RU.length)];
+      showFeedbackModal(true, randomMeme, `Шкала скорости: +${Math.round(400 * speedRatio)} | Серия: +${streakBonus}`, scoreAdded);
+    }, 1500);
     
   } else {
     // Incorrect answer
@@ -593,8 +601,11 @@ function handleAnswerSelection(selectedBtn, correctText, clickX, clickY) {
     soundManager.playWrong();
     updateStreakUI();
     
-    const randomMeme = WRONG_MEMES_RU[Math.floor(Math.random() * WRONG_MEMES_RU.length)];
-    showFeedbackModal(false, randomMeme, `Правильный ответ: ${correctText}`, 0);
+    // Delay feedback popup so user can see correct answer highlights (3 seconds for incorrect answer)
+    setTimeout(() => {
+      const randomMeme = WRONG_MEMES_RU[Math.floor(Math.random() * WRONG_MEMES_RU.length)];
+      showFeedbackModal(false, randomMeme, `Правильный ответ: ${correctText}`, 0);
+    }, 3000);
   }
   
   // Record history
