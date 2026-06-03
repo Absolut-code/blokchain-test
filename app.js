@@ -102,6 +102,7 @@ const soundManager = new SoundManager();
 
 // --- APP STATE ---
 const state = {
+  selectedSubject: 'blockchain',
   questions: [],          // Active question pool for the current round
   currentIndex: 0,        // Current question index in active pool
   score: 0,
@@ -183,6 +184,7 @@ const DOM = {
   redemptionScreen: document.getElementById('redemptionScreen'),
   gameOverScreen: document.getElementById('gameOverScreen'),
   
+  subjectSelect: document.getElementById('subjectSelect'),
   questionRange: document.getElementById('questionRange'),
   countGroup: document.getElementById('countGroup'),
   settingTimer: document.getElementById('settingTimer'),
@@ -229,9 +231,12 @@ const DOM = {
 
 // --- INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', () => {
-  // Update total questions from questions.js (QUIZ_QUESTIONS is global array)
-  if (typeof QUIZ_QUESTIONS !== 'undefined') {
-    DOM.totalDBQuestions.textContent = QUIZ_QUESTIONS.length;
+  // Update total questions from questions.js (QUIZ_SUBJECTS is global object)
+  if (typeof QUIZ_SUBJECTS !== 'undefined') {
+    updateLobbyForSubject();
+    DOM.subjectSelect.addEventListener('change', () => {
+      updateLobbyForSubject();
+    });
   }
   
   initBackgroundParticles();
@@ -297,39 +302,72 @@ function setupLobbyEvents() {
   });
 }
 
+// --- SUBJECT & RANGE DYNAMIC UPDATE ---
+function updateLobbyForSubject() {
+  const subject = DOM.subjectSelect.value;
+  state.selectedSubject = subject;
+  
+  const questions = QUIZ_SUBJECTS[subject] || [];
+  DOM.totalDBQuestions.textContent = questions.length;
+  
+  // Update the questionRange select options
+  DOM.questionRange.innerHTML = '';
+  
+  // Add "All" option
+  const allOpt = document.createElement('option');
+  allOpt.value = 'all';
+  allOpt.selected = true;
+  if (subject === 'blockchain') {
+    allOpt.textContent = `Все вопросы (1-${questions.length}) — Полный курс`;
+  } else {
+    allOpt.textContent = `Барлық сұрақтар (1-${questions.length}) — Толық курс`;
+  }
+  DOM.questionRange.appendChild(allOpt);
+  
+  // Generate sub-ranges of 40
+  const chunkSize = 40;
+  for (let i = 0; i < questions.length; i += chunkSize) {
+    const start = i + 1;
+    const end = Math.min(i + chunkSize, questions.length);
+    const opt = document.createElement('option');
+    opt.value = `${start}-${end}`;
+    
+    if (subject === 'blockchain') {
+      let title = `Вопросы ${start}-${end}`;
+      if (start === 1) title += ': Введение в Блокчейн';
+      else if (start === 41) title += ': Основы и Децентрализация';
+      else if (start === 81) title += ': Архитектура и Хэширование';
+      else if (start === 121) title += ': Криптография и Ключи';
+      else if (start === 161) title += ': Консенсусы и Безопасность';
+      else if (start === 202) title += ': Атаки и Разветвления (Forks)';
+      else if (start === 242) title += ': Криптовалюты и Сеть Bitcoin';
+      else if (start === 282) title += ': Смарт-контракты и DeFi';
+      opt.textContent = title;
+    } else {
+      let title = `Сұрақтар ${start}-${end}`;
+      if (start === 1) title += ': Кіріспе және Өндірістік кәсіпорын';
+      else if (start === 41) title += ': Негізгі және Айналым қорлары';
+      else if (start === 81) title += ': Шығындар және Өзіндік құн';
+      else if (start === 121) title += ': Еңбек ресурстары және Еңбекақы';
+      else if (start === 161) title += ': Пайда және Рентабельділік';
+      else if (start === 202) title += ': Инвестициялар және Негізгі қорлар тозуы';
+      else if (start === 242) title += ': Айналым қорларының айналымы';
+      else if (start === 282) title += ': Шығындар сметасы және Тарифтер';
+      opt.textContent = title;
+    }
+    DOM.questionRange.appendChild(opt);
+  }
+}
+
 function prepareQuestionsPool() {
-  if (typeof QUIZ_QUESTIONS === 'undefined') return;
+  if (typeof QUIZ_SUBJECTS === 'undefined') return;
   
-  let pool = [...QUIZ_QUESTIONS];
+  let pool = [...(QUIZ_SUBJECTS[state.selectedSubject] || [])];
   
-  // Filter by range
+  // Filter by range generic implementation
   if (state.selectedRange !== 'all') {
     const [start, end] = state.selectedRange.split('-').map(Number);
-    // Since index in questions might not match numbers exactly, we parse the numbers
-    // but the source files are sequential. Let's slice based on indices.
-    // 1-40 => first 40 questions (index 0 to 39)
-    // 41-80 => index 40 to 79
-    // 81-120 => index 80 to 119
-    // 121-160 => index 120 to 159
-    // 161-201 => index 160 to 200 (Note: file 5 had 41 questions)
-    // 202-241 => index 201 to 240
-    // 242-281 => index 241 to 280
-    // 282-301 => index 281 to 300
-    
-    // Map ranges to actual indices
-    let startIndex = 0;
-    let endIndex = pool.length;
-    
-    if (state.selectedRange === '1-40') { startIndex = 0; endIndex = 40; }
-    else if (state.selectedRange === '41-80') { startIndex = 40; endIndex = 80; }
-    else if (state.selectedRange === '81-120') { startIndex = 80; endIndex = 120; }
-    else if (state.selectedRange === '121-160') { startIndex = 120; endIndex = 160; }
-    else if (state.selectedRange === '161-201') { startIndex = 160; endIndex = 201; }
-    else if (state.selectedRange === '202-241') { startIndex = 201; endIndex = 241; }
-    else if (state.selectedRange === '242-281') { startIndex = 241; endIndex = 281; }
-    else if (state.selectedRange === '282-301') { startIndex = 281; endIndex = 301; }
-    
-    pool = pool.slice(startIndex, endIndex);
+    pool = pool.slice(start - 1, end);
   }
   
   // Shuffle pool if selected
