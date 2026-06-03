@@ -1,4 +1,4 @@
-const CACHE_NAME = 'blockchain-quiz-v5';
+const CACHE_NAME = 'blockchain-quiz-v6';
 const ASSETS = [
   './',
   './index.html',
@@ -37,25 +37,46 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch Event (Cache First with Network Fallback/Update)
+// Fetch Event (Network First for Web Assets, Cache First for media)
 self.addEventListener('fetch', (event) => {
-  // Only handle GET requests
   if (event.request.method !== 'GET') return;
 
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        // Fetch new version in background to update cache (Stale-While-Revalidate)
-        fetch(event.request).then((networkResponse) => {
+  const url = event.request.url;
+  const isWebAsset = url.endsWith('/') || url.includes('.html') || url.includes('.js') || url.includes('.css') || url.includes('.json');
+
+  if (isWebAsset) {
+    // Network First Strategy
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
           if (networkResponse.status === 200) {
+            const responseClone = networkResponse.clone();
             caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, networkResponse);
+              cache.put(event.request, responseClone);
             });
           }
-        }).catch(() => {/* Ignore network errors offline */});
-        return cachedResponse;
-      }
-      return fetch(event.request);
-    })
-  );
+          return networkResponse;
+        })
+        .catch(() => {
+          return caches.match(event.request);
+        })
+    );
+  } else {
+    // Cache First with Network Fallback (for images/icons/fonts)
+    event.respondWith(
+      caches.match(event.request).then((cachedResponse) => {
+        if (cachedResponse) {
+          fetch(event.request).then((networkResponse) => {
+            if (networkResponse.status === 200) {
+              caches.open(CACHE_NAME).then((cache) => {
+                cache.put(event.request, networkResponse);
+              });
+            }
+          }).catch(() => {});
+          return cachedResponse;
+        }
+        return fetch(event.request);
+      })
+    );
+  }
 });
