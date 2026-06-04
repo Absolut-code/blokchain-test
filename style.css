@@ -773,15 +773,14 @@ input:checked + .slider:before {
 }
 
 .redemption-choice-btn {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
+  padding: 0.85rem 1.5rem;
+  border-radius: 16px;
   border: 1px solid var(--border-color);
   background-color: rgba(255, 255, 255, 0.05);
   color: var(--text-white);
-  font-family: var(--font-logo);
-  font-size: 1.2rem;
-  font-weight: 700;
+  font-family: var(--font-main);
+  font-size: 1.05rem;
+  font-weight: 600;
   cursor: pointer;
   transition: var(--transition-fast);
 }
@@ -1052,4 +1051,19 @@ input:checked + .slider:before {
     flex-grow: 1;
     justify-content: center;
   }
+}
+
+/* FINAL GRADE BADGE */
+.final-grade-text {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-top: 8px;
+  color: var(--neon-cyan);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px 12px;
+  border-radius: 20px;
+  display: inline-block;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }

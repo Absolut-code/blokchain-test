@@ -123,6 +123,10 @@ const state = {
   history: [],            // Elements: { question, options, selected, correct, isCorrect, scoreAdded, timeSpent }
   failedQuestions: [],    // Elements: index from history to redemption
   redemptionIndex: null,  // Currently active redemption item index
+  lastRedeemedBatch: 0,
+  isBatchRedemptionActive: false,
+  nextIndexAfterRedemption: 0,
+  isEndOfGameAfterBatchRedemption: false,
   
   // Configuration
   selectedRange: 'all',
@@ -222,6 +226,7 @@ const DOM = {
   
   finalScore: document.getElementById('finalScore'),
   finalAccuracy: document.getElementById('finalAccuracy'),
+  finalGrade: document.getElementById('finalGrade'),
   finalStreak: document.getElementById('finalStreak'),
   accuracyCircle: document.getElementById('accuracyCircle'),
   restartGameBtn: document.getElementById('restartGameBtn'),
@@ -286,6 +291,10 @@ function setupLobbyEvents() {
     state.maxStreak = 0;
     state.history = [];
     state.failedQuestions = [];
+    state.lastRedeemedBatch = 0;
+    state.isBatchRedemptionActive = false;
+    state.nextIndexAfterRedemption = 0;
+    state.isEndOfGameAfterBatchRedemption = false;
     
     // Reset Power-ups
     state.pu5050Available = true;
@@ -409,8 +418,17 @@ function loadQuestion(index) {
   
   if (index >= state.questions.length) {
     // End of normal questions
+    if (index > 0 && index % 10 === 0 && (index / 10) > state.lastRedeemedBatch) {
+      const triggered = triggerBatchRedemption(index, true);
+      if (triggered) return;
+    }
     triggerEndGameFlow();
     return;
+  }
+  
+  if (index > 0 && index % 10 === 0 && (index / 10) > state.lastRedeemedBatch) {
+    const triggered = triggerBatchRedemption(index, false);
+    if (triggered) return;
   }
   
   state.currentIndex = index;
@@ -748,32 +766,99 @@ function showFeedbackModal(isCorrect, title, meme, points) {
 
 // --- REDEMPTION SYSTEM FLOW ---
 function setupRedemptionEvents() {
-  // Empty listener, we build redemption list in triggerEndGameFlow
+  // Empty listener, we build redemption list dynamically
+}
+
+function triggerBatchRedemption(nextIndex, isEndOfGame) {
+  const start = nextIndex - 10;
+  const end = nextIndex - 1;
+  const batchFailed = [];
+  for (let i = start; i <= end; i++) {
+    if (state.history[i] && !state.history[i].isCorrect) {
+      batchFailed.push(i);
+    }
+  }
+  
+  if (batchFailed.length === 0) {
+    state.lastRedeemedBatch = nextIndex / 10;
+    return false;
+  }
+  
+  state.lastRedeemedBatch = nextIndex / 10;
+  state.isBatchRedemptionActive = true;
+  state.nextIndexAfterRedemption = nextIndex;
+  state.isEndOfGameAfterBatchRedemption = isEndOfGame;
+  
+  showRedemptionScreen(batchFailed, true);
+  return true;
 }
 
 function triggerEndGameFlow() {
-  // Check if we have failed questions for redemption
-  if (state.failedQuestions.length > 0) {
-    showScreen(DOM.redemptionScreen);
-    buildRedemptionUI();
+  const uncorrectedFailedIndices = [];
+  state.history.forEach((h, idx) => {
+    if (!h.isCorrect) {
+      uncorrectedFailedIndices.push(idx);
+    }
+  });
+
+  if (uncorrectedFailedIndices.length > 0) {
+    showRedemptionScreen(uncorrectedFailedIndices, false);
   } else {
     showGameOverScreen();
   }
 }
 
-function buildRedemptionUI() {
-  DOM.redemptionChoicesList.innerHTML = '';
-  DOM.redemptionGameArea.style.display = 'none';
+function showRedemptionScreen(failedIndices, isBatch) {
+  showScreen(DOM.redemptionScreen);
   
-  state.failedQuestions.forEach((historyIndex, idx) => {
-    const btn = document.createElement('button');
-    btn.className = 'redemption-choice-btn';
-    btn.textContent = idx + 1;
-    btn.addEventListener('click', () => {
-      startRedemptionQuestion(historyIndex);
+  const badge = document.getElementById('redemptionBadge');
+  const title = document.getElementById('redemptionTitle');
+  const desc = document.getElementById('redemptionDesc');
+  
+  if (isBatch) {
+    if (badge) badge.textContent = "АРАЛЫҚ БАҚЫЛАУ / РУБЕЖ 🎯";
+    if (title) title.textContent = "Время исправить ошибки! / Қателерді түзету уақыты!";
+    if (desc) {
+      if (failedIndices.length === 1) {
+        desc.textContent = "Вы допустили 1 ошибку в этом блоке. Исправьте её прямо сейчас! / Сіз бұл блокта 1 қате жібердіңіз. Оны қазір түзетіңіз!";
+      } else {
+        desc.textContent = `Вы допустили ${failedIndices.length} ошибки/ок в этом блоке. Выберите карточку вслепую, чтобы исправить одну из них! / Сіз бұл блокта ${failedIndices.length} қате жібердіңіз. Олардың бірін түзету үшін карточканы таңдаңыз!`;
+      }
+    }
+  } else {
+    if (badge) badge.textContent = "СОҢҒЫ МҮМКІНДІК / ФИНАЛЬНЫЙ ШАНС 🛟";
+    if (title) title.textContent = "Последний шанс исправить ошибки! / Қателерді түзетудің соңғы мүмкіндігі!";
+    if (desc) {
+      if (failedIndices.length === 1) {
+        desc.textContent = "У вас осталась 1 неисправленная ошибка. Исправьте её! / Сізде 1 түзетілмеген қате қалды. Оны түзетіңіз!";
+      } else {
+        desc.textContent = `У вас осталось ${failedIndices.length} неисправленных ошибок. Выберите карточку, чтобы исправить одну из них! / Сізде ${failedIndices.length} түзетілмеген қате қалды. Біреуін түзету үшін карточканы таңдаңыз!`;
+      }
+    }
+  }
+  
+  if (failedIndices.length === 1) {
+    startRedemptionQuestion(failedIndices[0]);
+  } else {
+    DOM.redemptionChoicesList.style.display = 'flex';
+    DOM.redemptionGameArea.style.display = 'none';
+    DOM.redemptionChoicesList.innerHTML = '';
+    
+    let displayedIndices = [...failedIndices];
+    if (displayedIndices.length > 3) {
+      displayedIndices = shuffleArray(displayedIndices).slice(0, 3);
+    }
+    
+    displayedIndices.forEach((historyIndex, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'redemption-choice-btn';
+      btn.innerHTML = `<span>❓ Карточка ${idx + 1}</span>`;
+      btn.addEventListener('click', () => {
+        startRedemptionQuestion(historyIndex);
+      });
+      DOM.redemptionChoicesList.appendChild(btn);
     });
-    DOM.redemptionChoicesList.appendChild(btn);
-  });
+  }
 }
 
 function startRedemptionQuestion(historyIndex) {
@@ -785,10 +870,8 @@ function startRedemptionQuestion(historyIndex) {
   
   DOM.redemptionQuestionText.textContent = historyItem.question;
   
-  // Prepare options
   const correctText = historyItem.correct;
   
-  // Shuffled indices
   let optionIndices = [0, 1, 2, 3, 4].slice(0, historyItem.options.length);
   if (state.configShuffleOptions) {
     optionIndices = shuffleArray(optionIndices);
@@ -833,10 +916,8 @@ function handleRedemptionAnswer(selectedBtn, correctText, clickX, clickY) {
     soundManager.playCorrect();
     triggerBurstEffect(clickX || window.innerWidth / 2, clickY || window.innerHeight / 2);
     
-    // Add flat bonus to score
     state.score += 500;
     
-    // Update original history record to marked Corrected
     historyItem.isCorrect = true;
     historyItem.scoreAdded += 500;
     historyItem.selected = `[ИСПРАВЛЕНО] ${correctText}`;
@@ -856,9 +937,18 @@ function handleRedemptionAnswer(selectedBtn, correctText, clickX, clickY) {
     soundManager.playWrong();
   }
   
-  // Proceed to game over after 2 seconds
   setTimeout(() => {
-    showGameOverScreen();
+    if (state.isBatchRedemptionActive) {
+      state.isBatchRedemptionActive = false;
+      if (state.isEndOfGameAfterBatchRedemption) {
+        triggerEndGameFlow();
+      } else {
+        showScreen(DOM.gameplayScreen);
+        loadQuestion(state.nextIndexAfterRedemption);
+      }
+    } else {
+      showGameOverScreen();
+    }
   }, 2000);
 }
 
@@ -873,6 +963,10 @@ function setupGameOverEvents() {
     state.maxStreak = 0;
     state.history = [];
     state.failedQuestions = [];
+    state.lastRedeemedBatch = 0;
+    state.isBatchRedemptionActive = false;
+    state.nextIndexAfterRedemption = 0;
+    state.isEndOfGameAfterBatchRedemption = false;
     
     state.pu5050Available = true;
     state.puFreezeAvailable = true;
@@ -904,6 +998,21 @@ function showGameOverScreen() {
   const accuracy = total > 0 ? Math.round((correctCount / total) * 100) : 0;
   
   DOM.finalAccuracy.textContent = `${accuracy}%`;
+  
+  // Calculate Grade
+  let gradeText = "";
+  if (accuracy >= 90) {
+    gradeText = "Баға / Оценка: 5 (Өте жақсы / Отлично)";
+  } else if (accuracy >= 70) {
+    gradeText = "Баға / Оценка: 4 (Жақсы / Хорошо)";
+  } else if (accuracy >= 50) {
+    gradeText = "Баға / Оценка: 3 (Қанағаттанарлық / Удовлетворительно)";
+  } else {
+    gradeText = "Баға / Оценка: 2 (Қанағаттанарлықсыз / Неудовлетворительно)";
+  }
+  if (DOM.finalGrade) {
+    DOM.finalGrade.textContent = gradeText;
+  }
   
   // Animate accuracy ring
   const circle = DOM.accuracyCircle;

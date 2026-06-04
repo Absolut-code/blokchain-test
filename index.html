@@ -208,9 +208,9 @@
     <!-- REDEMPTION SCREEN -->
     <section id="redemptionScreen" class="screen">
       <div class="redemption-card glass animate-pop">
-        <div class="redemption-badge">СПАСИТЕЛЬНЫЙ КРУГ 🛟</div>
-        <h2>Время исправить ошибку!</h2>
-        <p class="redemption-desc">В течение игры вы совершили ошибки. Выберите один из неверно отвеченных вопросов ниже и ответьте правильно, чтобы заработать бонусные очки!</p>
+        <div class="redemption-badge" id="redemptionBadge">СПАСИТЕЛЬНЫЙ КРУГ 🛟</div>
+        <h2 id="redemptionTitle">Время исправить ошибку!</h2>
+        <p class="redemption-desc" id="redemptionDesc">В течение игры вы совершили ошибки. Выберите один из неверно отвеченных вопросов ниже и ответьте правильно, чтобы заработать бонусные очки!</p>
         
         <div class="redemption-choices" id="redemptionChoicesList">
           <!-- Button list of failed question indexes -->
@@ -252,6 +252,7 @@
             <div class="progress-ring-text" id="finalAccuracy">0%</div>
           </div>
           <span class="stat-label">Точность ответов</span>
+          <div id="finalGrade" class="final-grade-text"></div>
         </div>
 
         <div class="stat-card glass">
