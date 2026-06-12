@@ -1,4 +1,4 @@
-const CACHE_NAME = 'blockchain-quiz-v11';
+const CACHE_NAME = 'blockchain-quiz-v12';
 const ASSETS = [
   './',
   './index.html',
@@ -45,9 +45,18 @@ self.addEventListener('fetch', (event) => {
   const isWebAsset = url.endsWith('/') || url.includes('.html') || url.includes('.js') || url.includes('.css') || url.includes('.json');
 
   if (isWebAsset) {
-    // Network First Strategy
+    // Network First Strategy, bypass browser HTTP cache to force fresh fetch
+    let fetchRequest = event.request;
+    try {
+      if (event.request.mode === 'navigate' || event.request.mode === 'same-origin') {
+        fetchRequest = new Request(event.request, { cache: 'reload' });
+      }
+    } catch (e) {
+      // Fallback to original request
+    }
+
     event.respondWith(
-      fetch(event.request)
+      fetch(fetchRequest)
         .then((networkResponse) => {
           if (networkResponse.status === 200) {
             const responseClone = networkResponse.clone();
