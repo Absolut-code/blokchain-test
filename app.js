@@ -184,7 +184,7 @@ function triggerBurstEffect(x, y) {
 const DOM = {
   lobbyScreen: document.getElementById('lobbyScreen'),
   gameplayScreen: document.getElementById('gameplayScreen'),
-  feedbackOverlay: document.getElementById('feedbackOverlay'),
+  nextQuestionContainer: document.getElementById('nextQuestionContainer'),
   redemptionScreen: document.getElementById('redemptionScreen'),
   gameOverScreen: document.getElementById('gameOverScreen'),
   
@@ -212,10 +212,6 @@ const DOM = {
   powerupFreeze: document.getElementById('powerupFreeze'),
   powerupDouble: document.getElementById('powerupDouble'),
   
-  feedbackIcon: document.getElementById('feedbackIcon'),
-  feedbackTitle: document.getElementById('feedbackTitle'),
-  feedbackMeme: document.getElementById('feedbackMeme'),
-  feedbackPoints: document.getElementById('feedbackPoints'),
   nextQuestionBtn: document.getElementById('nextQuestionBtn'),
   
   redemptionChoicesList: document.getElementById('redemptionChoicesList'),
@@ -415,6 +411,11 @@ function prepareQuestionsPool() {
 function loadQuestion(index) {
   // Clear any existing timer
   clearInterval(state.timerInterval);
+  
+  // Hide next question button container
+  if (DOM.nextQuestionContainer) {
+    DOM.nextQuestionContainer.style.display = 'none';
+  }
   
   if (index >= state.questions.length) {
     // End of normal questions
@@ -616,11 +617,9 @@ function handleAnswerSelection(selectedBtn, correctText, clickX, clickY) {
     
     updateStreakUI();
     
-    // Delay feedback popup so user can see highlights (1.5 seconds for correct answer)
-    setTimeout(() => {
-      const randomMeme = CORRECT_MEMES_RU[Math.floor(Math.random() * CORRECT_MEMES_RU.length)];
-      showFeedbackModal(true, randomMeme, `Шкала скорости: +${Math.round(400 * speedRatio)} | Серия: +${streakBonus}`, scoreAdded);
-    }, 1500);
+    // Show feedback immediately without delay
+    const randomMeme = CORRECT_MEMES_RU[Math.floor(Math.random() * CORRECT_MEMES_RU.length)];
+    showFeedbackModal(true, randomMeme, `Шкала скорости: +${Math.round(400 * speedRatio)} | Серия: +${streakBonus}`, scoreAdded);
     
   } else {
     // Incorrect answer
@@ -641,11 +640,9 @@ function handleAnswerSelection(selectedBtn, correctText, clickX, clickY) {
     soundManager.playWrong();
     updateStreakUI();
     
-    // Delay feedback popup so user can see correct answer highlights (3 seconds for incorrect answer)
-    setTimeout(() => {
-      const randomMeme = WRONG_MEMES_RU[Math.floor(Math.random() * WRONG_MEMES_RU.length)];
-      showFeedbackModal(false, randomMeme, `Правильный ответ: ${correctText}`, 0);
-    }, 3000);
+    // Show feedback immediately without delay
+    const randomMeme = WRONG_MEMES_RU[Math.floor(Math.random() * WRONG_MEMES_RU.length)];
+    showFeedbackModal(false, randomMeme, `Правильный ответ: ${correctText}`, 0);
   }
   
   // Record history
@@ -727,7 +724,9 @@ function setupGameplayEvents() {
 
   // Feedback modal button click
   DOM.nextQuestionBtn.addEventListener('click', () => {
-    DOM.feedbackOverlay.classList.remove('active');
+    if (DOM.nextQuestionContainer) {
+      DOM.nextQuestionContainer.style.display = 'none';
+    }
     loadQuestion(state.currentIndex + 1);
   });
 
@@ -741,27 +740,14 @@ function setupGameplayEvents() {
 }
 
 function showFeedbackModal(isCorrect, title, meme, points) {
-  DOM.feedbackOverlay.classList.add('active');
-  
-  const card = DOM.feedbackOverlay.querySelector('.feedback-card');
-  card.className = 'feedback-card glass animate-pop';
-  
-  if (isCorrect) {
-    card.classList.add('correct');
-    DOM.feedbackIcon.textContent = "🎉";
-    DOM.feedbackPoints.textContent = `+${points} очков`;
-    DOM.feedbackPoints.style.display = 'block';
-  } else {
-    card.classList.add('wrong');
-    DOM.feedbackIcon.textContent = "❌";
-    DOM.feedbackPoints.style.display = 'none';
+  if (DOM.nextQuestionContainer) {
+    DOM.nextQuestionContainer.style.display = 'block';
   }
   
-  DOM.feedbackTitle.textContent = title;
-  DOM.feedbackMeme.textContent = meme;
-  
   // Auto-focus next button
-  DOM.nextQuestionBtn.focus();
+  if (DOM.nextQuestionBtn) {
+    DOM.nextQuestionBtn.focus();
+  }
 }
 
 // --- REDEMPTION SYSTEM FLOW ---

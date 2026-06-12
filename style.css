@@ -650,29 +650,21 @@ input:checked + .slider:before {
   filter: grayscale(1);
 }
 
-/* FEEDBACK OVERLAY */
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 10;
-  background-color: rgba(10, 8, 20, 0.95); /* Opaque background to avoid rendering composite layers */
+/* INLINE FEEDBACK CONTAINER */
+.inline-feedback-container {
   display: none;
-  justify-content: center;
-  align-items: center;
-  padding: 1rem;
+  width: 100%;
+  margin-top: 1.5rem;
 }
 
-.overlay.active {
-  display: flex;
+.inline-feedback-container.active {
+  display: block;
 }
 
 .feedback-card {
   width: 100%;
-  max-width: 480px;
-  padding: 3rem 2rem;
+  max-width: 100%;
+  padding: 2rem 1.5rem;
   text-align: center;
   display: flex;
   flex-direction: column;
