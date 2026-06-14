@@ -59,11 +59,11 @@ class SoundManager {
   }
 
   playStreak() {
-    // High celebratory chime arpeggio
-    this.playTone(880.00, 'triangle', 0.1, 0);    // A5
-    this.playTone(1109.73, 'triangle', 0.1, 0.05); // C#6
-    this.playTone(1318.51, 'triangle', 0.1, 0.1);  // E6
-    this.playTone(1760.00, 'triangle', 0.25, 0.15); // A6
+    // Celebratory C5 -> E5 -> G5 -> C6 chime arpeggio
+    this.playTone(523.25, 'triangle', 0.15, 0);      // C5
+    this.playTone(659.25, 'triangle', 0.15, 0.08);   // E5
+    this.playTone(783.99, 'triangle', 0.15, 0.16);   // G5
+    this.playTone(1046.50, 'triangle', 0.3, 0.24);   // C6
   }
 
   playPowerup() {
