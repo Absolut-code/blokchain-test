@@ -1,5 +1,5 @@
 /**
- * BLOCKCHAIN QUIZ — GAME ENGINE (Quizizz Style)
+ * DUOBINGO — GAME ENGINE
  * Written in Vanilla JavaScript.
  * Autonomously uses Web Audio API for sound effects (works offline, no dependencies).
  */
@@ -102,7 +102,7 @@ const soundManager = new SoundManager();
 
 // --- APP STATE ---
 const state = {
-  selectedSubject: 'blockchain',
+  selectedSubject: 'networks',
   questions: [],          // Active question pool for the current round
   currentIndex: 0,        // Current question index in active pool
   score: 0,
@@ -309,7 +309,7 @@ function setupLobbyEvents() {
 
 // --- SUBJECT & RANGE DYNAMIC UPDATE ---
 function updateLobbyForSubject() {
-  const subject = DOM.subjectSelect.value;
+  const subject = DOM.subjectSelect ? DOM.subjectSelect.value : 'networks';
   state.selectedSubject = subject;
   
   const questions = QUIZ_SUBJECTS[subject] || [];
@@ -322,11 +322,7 @@ function updateLobbyForSubject() {
   const allOpt = document.createElement('option');
   allOpt.value = 'all';
   allOpt.selected = true;
-  if (subject === 'blockchain') {
-    allOpt.textContent = `Все вопросы (1-${questions.length}) — Полный курс`;
-  } else {
-    allOpt.textContent = `Барлық сұрақтар (1-${questions.length}) — Толық курс`;
-  }
+  allOpt.textContent = `Барлық сұрақтар (1-${questions.length}) — Толық курс`;
   DOM.questionRange.appendChild(allOpt);
   
   // Generate sub-ranges of 40
@@ -337,51 +333,16 @@ function updateLobbyForSubject() {
     const opt = document.createElement('option');
     opt.value = `${start}-${end}`;
     
-    if (subject === 'blockchain') {
-      let title = `Вопросы ${start}-${end}`;
-      if (start === 1) title += ': Введение в Блокчейн';
-      else if (start === 41) title += ': Основы и Децентрализация';
-      else if (start === 81) title += ': Архитектура и Хэширование';
-      else if (start === 121) title += ': Криптография и Ключи';
-      else if (start === 161) title += ': Консенсусы и Безопасность';
-      else if (start === 202) title += ': Атаки и Разветвления (Forks)';
-      else if (start === 242) title += ': Криптовалюты и Сеть Bitcoin';
-      else if (start === 282) title += ': Смарт-контракты и DeFi';
-      opt.textContent = title;
-    } else if (subject === 'economy') {
-      let title = `Сұрақтар ${start}-${end}`;
-      if (start === 1) title += ': Кіріспе және Өндірістік кәсіпорын';
-      else if (start === 41) title += ': Негізгі және Айналым қорлары';
-      else if (start === 81) title += ': Шығындар және Өзіндік құн';
-      else if (start === 121) title += ': Еңбек ресурстары және Еңбекақы';
-      else if (start === 161) title += ': Пайда және Рентабельділік';
-      else if (start === 202) title += ': Инвестициялар және Негізгі қорлар тозуы';
-      else if (start === 242) title += ': Айналым қорларының айналымы';
-      else if (start === 282) title += ': Шығындар сметасы және Тарифтер';
-      opt.textContent = title;
-    } else if (subject === 'law') {
-      let title = `Сұрақтар ${start}-${end}`;
-      if (start === 1) title += ': Заңнама және Кодекстер';
-      else if (start === 41) title += ': Кәсіпкерлік субъектілері және Тіркеу';
-      else if (start === 81) title += ': Лицензиялау және Реттеу';
-      else if (start === 121) title += ': Шаруашылық серіктестіктер және Қоғамдар';
-      else if (start === 161) title += ': Банкроттық және Дәрменсіздік';
-      else if (start === 201) title += ': Мемлекеттік реттеу және Сатып алулар';
-      else if (start === 241) title += ': Инвестициялар және Концессия';
-      else if (start === 281) title += ': Сауда және Сақтандыру қызметі';
-      opt.textContent = title;
-    } else if (subject === 'theory') {
-      let title = `Сұрақтар ${start}-${end}`;
-      if (start === 1) title += ': Кәсіпкерлік теориялық негіздері';
-      else if (start === 41) title += ': Нарықтық орта және Консалтинг';
-      else if (start === 81) title += ': Ұйымдық формалар және Тіркеу';
-      else if (start === 121) title += ': Цифрлық экономика және Факторлар';
-      else if (start === 161) title += ': Цифрландыру және Салалар';
-      else if (start === 201) title += ': Бұлтты технологиялар және Деректер';
-      else if (start === 241) title += ': Сандық платформалар және Даму';
-      else if (start === 281) title += ': Цифрлық ақша теориясы';
-      opt.textContent = title;
-    }
+    let title = `Сұрақтар ${start}-${end}`;
+    if (start === 1) title += ': Кіріспе, желілер және топологиялар';
+    else if (start === 41) title += ': Кабельдер және сымсыз желілер';
+    else if (start === 81) title += ': Желілік стандарттар мен хаттамалар';
+    else if (start === 121) title += ': OSI үлгісі және деңгейлері';
+    else if (start === 161) title += ': Желілік жабдықтар мен бағдарламалар';
+    else if (start === 201) title += ': Интернет және хаттамалар (TCP/IP, FTP, DNS)';
+    else if (start === 241) title += ': Маршруттау хаттамалары (OSPF, RIP, IP)';
+    else if (start === 281) title += ': Телекоммуникация және байланыс';
+    opt.textContent = title;
     DOM.questionRange.appendChild(opt);
   }
 }

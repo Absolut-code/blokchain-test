@@ -1,4 +1,4 @@
-const CACHE_NAME = 'blockchain-quiz-v12';
+const CACHE_NAME = 'duobingo-v1';
 const ASSETS = [
   './',
   './index.html',

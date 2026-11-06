@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>типа куизиз — Интерактивный тренажер</title>
-  <meta name="description" content="Интерактивное Quizizz-подобное веб-приложение для тестирования знаний. Проходите тесты снова и снова, бейте рекорды и активируйте бонусы!">
+  <title>Duobingo — Интерактивный тренажер</title>
+  <meta name="description" content="Интерактивное веб-приложение Duobingo для тестирования знаний. Проходите тесты снова и снова, бейте рекорды и активируйте бонусы!">
   
   <!-- Google Fonts: Inter & Outfit -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -33,9 +33,9 @@
       <header class="lobby-header">
         <div class="logo-area">
           <div class="logo-icon">⚡</div>
-          <h1>ТИПА<span>КУИЗИЗ</span></h1>
+          <h1>DUO<span>BINGO</span></h1>
         </div>
-        <p class="subtitle">Интерактивный тренажер в стиле Quizizz. Закрепляйте знания, ставьте рекорды и побеждайте!</p>
+        <p class="subtitle">Интерактивный тренажер Duobingo. Закрепляйте знания, ставьте рекорды и побеждайте!</p>
       </header>
 
       <div class="lobby-card glass">
@@ -43,10 +43,7 @@
         <div class="config-group">
           <label for="subjectSelect"><span class="icon">📚</span> Выберите предмет (Пәнді таңдаңыз):</label>
           <select id="subjectSelect" class="styled-select">
-            <option value="blockchain" selected>⛓️ Блокчейн технологиялары (Блокчейн)</option>
-            <option value="economy">📊 Экономика және өндірісті ұйымдастыру (Экономика)</option>
-            <option value="law">⚖️ Кәсіпкерлік құқық (Предпринимательское право)</option>
-            <option value="theory">💰 Кәсіпкерлік және цифрлық ақша теориясы (Цифровые деньги)</option>
+            <option value="networks" selected>🌐 Желілік технологиялар стандарттары (300 сұрақ)</option>
           </select>
         </div>
 
@@ -54,15 +51,15 @@
         <div class="config-group">
           <label for="questionRange"><span class="icon">📂</span> Выберите тему / диапазон вопросов:</label>
           <select id="questionRange" class="styled-select">
-            <option value="all" selected>Все вопросы (1-301) — Полный курс</option>
-            <option value="1-40">Вопросы 1-40: Введение в Блокчейн</option>
-            <option value="41-80">Вопросы 41-80: Основы и Децентрализация</option>
-            <option value="81-120">Вопросы 81-120: Архитектура и Хэширование</option>
-            <option value="121-160">Вопросы 121-160: Криптография и Ключи</option>
-            <option value="161-201">Вопросы 161-201: Консенсусы и Безопасность</option>
-            <option value="202-241">Вопросы 202-241: Атаки и Разветвления (Forks)</option>
-            <option value="242-281">Вопросы 242-281: Криптовалюты и Сеть Bitcoin</option>
-            <option value="282-301">Вопросы 282-301: Смарт-контракты и DeFi</option>
+            <option value="all" selected>Барлық сұрақтар (1-300) — Толық курс</option>
+            <option value="1-40">Сұрақтар 1-40: Кіріспе, желілер және топологиялар</option>
+            <option value="41-80">Сұрақтар 41-80: Кабельдер және сымсыз желілер</option>
+            <option value="81-120">Сұрақтар 81-120: Желілік стандарттар мен хаттамалар</option>
+            <option value="121-160">Сұрақтар 121-160: OSI үлгісі және деңгейлері</option>
+            <option value="161-200">Сұрақтар 161-200: Желілік жабдықтар мен бағдарламалар</option>
+            <option value="201-240">Сұрақтар 201-240: Интернет және хаттамалар (TCP/IP, FTP, DNS)</option>
+            <option value="241-280">Сұрақтар 241-280: Маршруттау хаттамалары (OSPF, RIP, IP)</option>
+            <option value="281-300">Сұрақтар 281-300: Телекоммуникация және байланыс</option>
           </select>
         </div>
 
@@ -132,7 +129,7 @@
 
       <!-- Quick stats in lobby -->
       <div class="lobby-footer">
-        <p>Всего в базе данных: <strong id="totalDBQuestions">301</strong> вопросов на казахском языке.</p>
+        <p>Всего в базе данных: <strong id="totalDBQuestions">300</strong> вопросов на казахском языке.</p>
       </div>
     </section>
 
